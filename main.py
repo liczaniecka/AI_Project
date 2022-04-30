@@ -1,2 +1,2 @@
 #AI Project
-print('hi')
+print('hi AI')
