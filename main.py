@@ -1,1 +1,2 @@
 #AI Project
+print('hi')
