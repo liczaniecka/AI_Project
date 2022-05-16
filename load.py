@@ -8,6 +8,7 @@ from sklearn.svm import SVC
 #Import scikit-learn metrics module for accuracy calculation
 from sklearn import metrics
 import numpy as np
+import pandas as pd
 
 GRAY_THRESHOLD = 120
 IMG_SIZE = 28
@@ -17,11 +18,13 @@ TRAIN_SET_SIZE = 4000
 TEST_SET_SIZE = 1000
 SET_SIZE = TRAIN_SET_SIZE + TEST_SET_SIZE
 
+
 def load_data():
     Images, Labels = loadlocal_mnist(
             images_path='train-images.idx3-ubyte', 
             labels_path='train-labels.idx1-ubyte')
     return Images, Labels
+
 
 def remove_gray(Image):
     for i in range(784):
@@ -30,6 +33,30 @@ def remove_gray(Image):
         else:
             Image[i] = 255
     return Image
+
+
+def create_pie_chart(Test_Labels, y_pred):
+    status_list = []
+
+    for i in range(len(Test_Labels)):
+        if y_pred[i] == Test_Labels[i]:
+            status_list.append('Success')
+        else:
+            status_list.append('Fail')
+
+    proportion = [status_list.count('Success'), status_list.count('Fail')]
+
+    # Pie no2
+    fig1, ax = pyplot.subplots()
+    patches, text, auto = ax.pie(proportion, autopct='%1.1f%%', colors=['#43C456', '#FF6565'],
+                                 wedgeprops={'linewidth': 1, 'edgecolor': 'white'},
+                                 pctdistance=1.15, startangle=160)
+    circle = pyplot.Circle((0, 0), 0.5, color='white')
+    pyplot.gcf().gca().add_artist(circle)
+    pyplot.legend(patches, ['Success', 'Fail'], loc='upper right', fontsize='xx-small', framealpha=0.4)
+
+    pyplot.show()
+
 
 # Loading all data
 ImagesAll, LabelsAll = load_data()
@@ -65,3 +92,5 @@ for i in range(9):
     tmp = np.reshape(Test_Images[i], (IMG_SIZE, IMG_SIZE))
     pyplot.imshow(tmp)
 pyplot.show()
+
+create_pie_chart(Test_Labels, y_pred)
