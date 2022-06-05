@@ -65,10 +65,20 @@ def create_pie_chart(Test_Labels, y_pred):
 
 
 def scatter_plot(accuracies, processing_times, learners):
-    scatter_plot_df = pd.DataFrame({'Accuracy': accuracies,
-                                    'Processing time': processing_times},
-                                   index=learners)
-    scatter_plot_df.plot.scatter(x='Accuracy', y='Processing time', color='green', size=100)
+    x1 = accuracies[0]
+    x2 = accuracies[1]
+    x3 = accuracies[2]
+    y1 = processing_times[0]
+    y2 = processing_times[1]
+    y3 = processing_times[2]
+
+    pyplot.scatter(x1, y1, s=100)
+    pyplot.scatter(x2, y2, s=100)
+    pyplot.scatter(x3, y3, s=100)
+
+    pyplot.legend(['svc', 'lr', 'rfc'])
+    pyplot.xlabel('Accuracy in %')
+    pyplot.ylabel('Time in seconds')
 
     pyplot.show()
 
