@@ -9,6 +9,7 @@ from sklearn.svm import SVC
 from sklearn import metrics
 import numpy as np
 import time
+import pandas as pd
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
@@ -19,8 +20,8 @@ GRAY_THRESHOLD = 120
 IMG_SIZE = 28
 NUMBER_OF_IMAGES = 60000
 
-TRAIN_SET_SIZE = 15000
-TEST_SET_SIZE = 3000
+TRAIN_SET_SIZE = 8000
+TEST_SET_SIZE = 2000
 SET_SIZE = TRAIN_SET_SIZE + TEST_SET_SIZE
 
 
@@ -63,6 +64,45 @@ def create_pie_chart(Test_Labels, y_pred):
     pyplot.savefig('Piechart')
 
 
+def scatter_plot(accuracies, processing_times, learners):
+    scatter_plot_df = pd.DataFrame({'Accuracy': accuracies,
+                                    'Processing time': processing_times},
+                                   index=learners)
+    scatter_plot_df.plot.scatter(x='Accuracy', y='Processing time', color='green', size=100)
+
+    pyplot.show()
+
+
+def predictions(learner):
+    start = time.time()
+
+    classifier = AdaBoostClassifier(n_estimators=40, base_estimator=learner, learning_rate=1.2)
+    model = classifier.fit(Train_Images, Train_Labels)
+
+    end = time.time()
+
+    y_pred = model.predict(Test_Images)
+
+    accuracy = metrics.accuracy_score(Test_Labels, y_pred) * 100
+    processing_time = end - start
+    print(f'Accuracy: {metrics.accuracy_score(Test_Labels, y_pred) * 100} %')
+
+    # Plotting few images
+    tmp = []
+    for i in range(9):
+        print(f'Label: {Test_Labels[i]} | Prediction: {y_pred[i]}')
+        pyplot.subplot(330 + 1 + i)
+        tmp = np.reshape(Test_Images[i], (IMG_SIZE, IMG_SIZE))
+        pyplot.imshow(tmp)
+
+    print(f'Time: {processing_time}')
+    pyplot.show()
+
+    create_pie_chart(Test_Labels, y_pred)
+
+    return accuracy, processing_time
+
+
 # Loading all data
 ImagesAll, LabelsAll = load_data()
 
@@ -85,26 +125,14 @@ rfc = RandomForestClassifier(n_estimators=40, random_state=1, criterion='gini') 
                 # for smaller samples entropy works better
 gnb = GaussianNB() # 64.4%
 
-start = time.time()
+# learners = [svc, lr, rfc, gnb]
+learners = [svc, rfc, gnb]
+processing_times = []
+accuracies = []
 
-classifier = AdaBoostClassifier(n_estimators=40, base_estimator=rfc, learning_rate=1.2)
-model = classifier.fit(Train_Images, Train_Labels)
+for i in learners:
+    results = predictions(i)
+    accuracies.append(results[0])
+    processing_times.append(results[1])
 
-end = time.time()
-
-y_pred = model.predict(Test_Images)
-
-print(f'Accuracy: {metrics.accuracy_score(Test_Labels, y_pred) * 100} %')
-
-# Plotting few images
-tmp = []
-for i in range(9):
-    print(f'Label: {Test_Labels[i]} | Prediction: {y_pred[i]}')
-    pyplot.subplot(330 + 1 + i)
-    tmp = np.reshape(Test_Images[i], (IMG_SIZE, IMG_SIZE))
-    pyplot.imshow(tmp)
-
-print(f'Time: {end-start}')
-pyplot.show()
-
-# create_pie_chart(Test_Labels, y_pred)
+scatter_plot(accuracies, processing_times, learners)
