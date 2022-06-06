@@ -9,7 +9,6 @@ from sklearn.svm import SVC
 from sklearn import metrics
 import numpy as np
 import time
-import pandas as pd
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
@@ -65,18 +64,18 @@ def create_pie_chart(Test_Labels, y_pred):
 
 
 def scatter_plot(accuracies, processing_times, learners):
-    x1 = accuracies[0]
-    x2 = accuracies[1]
-    x3 = accuracies[2]
-    y1 = processing_times[0]
-    y2 = processing_times[1]
-    y3 = processing_times[2]
+    x1 = accuracies[0:4]
+    x2 = accuracies[5:9]
+    x3 = accuracies[10:14]
+    y1 = processing_times[0:4]
+    y2 = processing_times[5:9]
+    y3 = processing_times[10:14]
 
-    pyplot.scatter(x1, y1, s=100)
-    pyplot.scatter(x2, y2, s=100)
-    pyplot.scatter(x3, y3, s=100)
+    pyplot.scatter(x1, y1, s=30, alpha=0.7)
+    pyplot.scatter(x2, y2, s=30, alpha=0.7)
+    pyplot.scatter(x3, y3, s=30, alpha=0.7)
 
-    pyplot.legend(['svc', 'lr', 'rfc'])
+    pyplot.legend(['svc', 'rfc', 'gnb'])
     pyplot.xlabel('Accuracy in %')
     pyplot.ylabel('Time in seconds')
 
@@ -141,8 +140,9 @@ processing_times = []
 accuracies = []
 
 for i in learners:
-    results = predictions(i)
-    accuracies.append(results[0])
-    processing_times.append(results[1])
+    for j in range(5):
+        results = predictions(i)
+        accuracies.append(results[0])
+        processing_times.append(results[1])
 
 scatter_plot(accuracies, processing_times, learners)
